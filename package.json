@@ -12,7 +12,10 @@
     "build:client": "parcel build src/client/index.html -d dist/static --public-url . --detailed-report",
     "prestart": "npm run build",
     "start": "node .",
-    "dev": "nodemon -w src/server -e ts,js,json -x npm run start",
+    "start:dev": "node .",
+    "dev": "run-p dev:client dev:server",
+    "dev:client": "parcel watch src/client/index.html -d dist/static --public-url .",
+    "dev:server": "nodemon -w src/server -e ts,js,json -x run-s build:server start:dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
