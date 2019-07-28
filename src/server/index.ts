@@ -5,6 +5,8 @@ import session from "express-session";
 import * as http from "http";
 import {Server} from "http";
 import path from "path";
+import socketio from "socket.io";
+import {api} from "./api";
 
 // tslint:disable:no-console
 
@@ -21,25 +23,33 @@ const sessionMiddleware: RequestHandler = session({
     saveUninitialized: true,
     secret: sessionSecret,
 });
-
 const app: Application = express();
+
 app.use(sessionMiddleware);
-
-// static route to UI
 app.get("/", express.static(path.join(process.cwd(), "dist", "static")));
-
 app.use(bodyParser.json());
-
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// route handlers for API
-app.get("/api", (req, res) => {
-    console.log(`Request to /api in session ${req.session.id}`);
-    res.send("Hello world!");
+// create the servers
+const httpServer: Server = http.createServer(app);
+const socketServer: socketio.Server = socketio(httpServer, { cookie: false });
+
+// use same session handling in web socket
+socketServer.use((socket, next) => {
+    sessionMiddleware(socket.request, {} as any, next);
 });
 
-// start the servers
-const httpServer: Server = http.createServer(app);
+// handle incoming sockets
+socketServer.sockets.on("connection", (socket) => {
+    const sessionId: string = socket.request.session.id;
+    console.info(`Moving socket ${socket.id} to room /priv/${sessionId}`);
+    socket.join("/priv/" + sessionId);
+});
+
+// route handlers for API
+app.use("/api", api(socketServer));
+
+// start server
 httpServer.listen(port, host, () => {
     console.log(`server started at http://${host}:${port}`);
 });
