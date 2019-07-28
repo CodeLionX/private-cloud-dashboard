@@ -1,4 +1,3 @@
-import { red } from "@material-ui/core/colors";
 import {createMuiTheme, Theme} from "@material-ui/core/styles";
 
 // Create a theme instance.
@@ -16,8 +15,8 @@ const theme: Theme = createMuiTheme({
             main: "#9F2D45",
         },
         background: {
-            default: "#DEE7E7",
-            paper: "#CAD2D2"
+            paper: "#DEE7E7",
+            default: "#CAD2D2"
         },
 
     },

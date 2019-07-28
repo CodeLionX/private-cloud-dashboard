@@ -1,79 +1,60 @@
 // tslint:disable:no-console
-import {
-    AppBar,
-    IconButton,
-    ListItemIcon,
-    ListItemText,
-    Menu,
-    MenuItem,
-    MuiThemeProvider,
-    Toolbar,
-    Typography
-} from "@material-ui/core";
-import {AccountCircle, PowerSettingsNew} from "@material-ui/icons";
+import {AppBar, createStyles, Theme, Toolbar, Typography} from "@material-ui/core";
+import Grid from "@material-ui/core/Grid";
+import makeStyles from "@material-ui/core/styles/makeStyles";
 import * as React from "react";
 import {Socket} from "socket.io-client";
-import * as socketio from "socket.io-client";
-import {style} from "typestyle";
+import ServerCard from "./components/ServerCard";
 
 export interface AppProps { // tslint:disable-line:no-empty-interface
 }
 
-export interface AppState { // tslint:disable-line:no-empty-interface
+const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        shared: {},
+        grid: {
+            flexGrow: 1,
+            padding: theme.spacing(2),
+        },
+        gridItem: {
+            margin: theme.spacing(2)
+        }
+    }),
+);
+
+export default function App(props: AppProps) {
+    const classes = useStyles(props);
+
+    return (
+        <div style={{height: "100%", width: "100%", flexGrow: 1}}>
+            <AppBar position="static">
+                <Toolbar>
+                    <Typography variant="h6" color="inherit">
+                        Private Cloud Console
+                    </Typography>
+                </Toolbar>
+            </AppBar>
+            <Grid container spacing={0} className={classes.grid}>
+                {[1, 2].map((i) => (
+                    <React.Fragment key={i}>
+                        <Grid item xs={6} sm={3} key={i} className={classes.gridItem}>
+                            <ServerCard serverType={"instance"} statusText={"Healthy"}/>
+                        </Grid>
+                        <Grid item xs={6} sm={3} key={100 + i} className={classes.gridItem}>
+                            <ServerCard serverType={"minecraft server"} statusText={"Healthy"}/>
+                        </Grid>
+                    </React.Fragment>
+                ))}
+            </Grid>
+        </div>
+    );
 }
 
-export default class App extends React.Component<AppProps, AppState> {
-
-    private readonly socket: typeof Socket;
-
-    constructor(props: AppProps) {
-        super(props);
-        this.state = {
-            loggedIn: false
-        };
-        this.socket = socketio.connect("http://localhost:8080");
-        this.socket.on("connect", () => {
-            console.info(`connected to server as ${this.socket.id}`);
-        });
-        this.socket.on("status", (data: any) => {
-            console.info(`Received status from server: ${JSON.stringify(data)}`);
-        });
-    }
-
-    private logout() {
-        // this.setState({
-        //     loggedIn: false,
-        //     loginData: undefined
-        // });
-    }
-
-    public render() {
-        return (
-            <div style={{height: "100%"}}>
-                <AppBar position="static" className={style({flexGrow: 1})}>
-                    <Toolbar>
-                        <Typography variant="h6" color="inherit" className={style({flexGrow: 1})}>
-                            Private Cloud Console
-                        </Typography>
-                        <div>
-                            <IconButton
-                                aria-owns={open ? "menu-appbar" : undefined}
-                                aria-haspopup="true"
-                                // onClick={}
-                                color="inherit"
-                            >
-                                <AccountCircle/>
-                            </IconButton>
-                        </div>
-                    </Toolbar>
-                </AppBar>
-                <div className={style({
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                })}>
-                </div>
-            </div>
-        );
-    }
-}
+// let socket: typeof Socket;
+// socket = socketio.connect("http://localhost:8080");
+// socket.on("connect", () => {
+//     console.info(`connected to server as ${this.socket.id}`);
+// });
+// socket.on("status", (data: any) => {
+//     console.info(`Received status from server: ${JSON.stringify(data)}`);
+// });
