@@ -6,7 +6,12 @@ export const api = (socketServer: socketio.Server) => {
     const router: Router = Router();
 
     router.get("/", (req, res) => {
-        logger.info(`Request to /api in session ${req.session.id}`);
+        const sessionId: string = req.session.id;
+
+        logger.info(`Request to /api in session ${sessionId}`);
+        socketServer
+            .in("/priv" + req.session.id)
+            .emit("status", "connected");
         res.send("Hello world!");
     });
     return router;
