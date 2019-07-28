@@ -7,8 +7,7 @@ import {Server} from "http";
 import path from "path";
 import socketio from "socket.io";
 import {api} from "./api";
-
-// tslint:disable:no-console
+import {logger} from "./logger";
 
 // configuration and settings
 dotenv.config();
@@ -42,7 +41,7 @@ socketServer.use((socket, next) => {
 // handle incoming sockets
 socketServer.sockets.on("connection", (socket) => {
     const sessionId: string = socket.request.session.id;
-    console.info(`Moving socket ${socket.id} to room /priv/${sessionId}`);
+    logger.info(`Moving socket ${socket.id} to room /priv/${sessionId}`);
     socket.join("/priv/" + sessionId);
 });
 
@@ -51,5 +50,5 @@ app.use("/api", api(socketServer));
 
 // start server
 httpServer.listen(port, host, () => {
-    console.log(`server started at http://${host}:${port}`);
+    logger.info(`server started at http://${host}:${port}`);
 });

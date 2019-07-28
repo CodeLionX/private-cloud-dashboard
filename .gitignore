@@ -179,3 +179,4 @@ typings/
 # build output
 dist
 .idea
+server.log
