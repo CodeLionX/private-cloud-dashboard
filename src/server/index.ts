@@ -16,6 +16,9 @@ const host: string = process.env.SERVER_IP; // host ip to bind to
 const port: number = parseInt(process.env.SERVER_PORT, 10); // port to listen
 const sessionSecret: string = process.env.SESSION_SECRET;
 
+const pathToStatic: string = path.join(process.cwd(), "dist", "static");
+logger.info(`Serving static files from ${pathToStatic}`);
+
 // server definition
 const sessionMiddleware: RequestHandler = session({
     resave: false,
@@ -25,7 +28,7 @@ const sessionMiddleware: RequestHandler = session({
 const app: Application = express();
 
 app.use(sessionMiddleware);
-app.get("/", express.static(path.join(process.cwd(), "dist", "static")));
+app.use("/", express.static(pathToStatic));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
