@@ -5,6 +5,7 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import useAxios from "axios-hooks";
 import * as React from "react";
 import ServerCard from "./components/ServerCard/";
+import TerminalDialog from "./components/TerminalDialog";
 
 export interface AppProps { // tslint:disable-line:no-empty-interface
 }
@@ -52,15 +53,7 @@ export default function App(props: AppProps) {
                     </Grid>
                 ))}
             </Grid>
+            <TerminalDialog/>
         </div>
     );
 }
-
-// let socket: typeof Socket;
-// socket = socketio.connect("http://localhost:8080");
-// socket.on("connect", () => {
-//     console.info(`connected to server as ${this.socket.id}`);
-// });
-// socket.on("status", (data: any) => {
-//     console.info(`Received status from server: ${JSON.stringify(data)}`);
-// });
