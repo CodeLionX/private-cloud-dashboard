@@ -1,0 +1,89 @@
+{
+  "canIpForward": true,
+  "cpuPlatform": "Intel Broadwell",
+  "creationTimestamp": "2019-07-19T06:09:02.212-07:00",
+  "deletionProtection": false,
+  "description": "",
+  "disks": [
+    {
+      "autoDelete": true,
+      "boot": true,
+      "deviceName": "vpn-server",
+      "guestOsFeatures": [
+        {
+          "type": "VIRTIO_SCSI_MULTIQUEUE"
+        }
+      ],
+      "index": 0,
+      "interface": "SCSI",
+      "kind": "compute#attachedDisk",
+      "licenses": [
+        "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1804-lts"
+      ],
+      "mode": "READ_WRITE",
+      "source": "https://www.googleapis.com/compute/v1/projects/private-cloud-247212/zones/europe-west3-c/disks/vpn-server",
+      "type": "PERSISTENT"
+    }
+  ],
+  "id": "8827462774056320514",
+  "kind": "compute#instance",
+  "labelFingerprint": "42WmSpB8rSM=",
+  "machineType": "https://www.googleapis.com/compute/v1/projects/private-cloud-247212/zones/europe-west3-c/machineTypes/f1-micro",
+  "metadata": {
+    "fingerprint": "tn0Eum3k2Ak=",
+    "items": [
+      {
+        "key": "ssh-keys",
+        "value": "christoph:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDOoqpW2k2VdRaqpnhp6+eIpSj7xf9USj+ZWok9SZ0W5BKZwNQF0SzF04z8FD7rfzgP6vo0fx6jnhFOXUZCRhqhE8HLJ80/sJlvS82J8aMg6756BFloAiV1BpFL+xAR62mlcL6tZIST5bVi1ooA9XSa+bH6m/eMxUXWD95dz6XNSc49MW82IdPP4RTA/dg/2sbN6hLWjLoGQffcgvrzkzEFu/5G1n5yqfrqdjacG6WfcOxcN563fR3JrGN2a2FsgaSFE78lanDM5nZug5kpxu/VCJ1oYSbt55s6vPu80VwrdzgDEW6NKA8uSWlPXgo4zS2qfM0AbfZGyHsAjO4VtDXR christoph@familie-anders.de"
+      }
+    ],
+    "kind": "compute#metadata"
+  },
+  "name": "vpn-server",
+  "networkInterfaces": [
+    {
+      "accessConfigs": [
+        {
+          "kind": "compute#accessConfig",
+          "name": "External NAT",
+          "natIP": "35.246.217.60",
+          "networkTier": "PREMIUM",
+          "type": "ONE_TO_ONE_NAT"
+        }
+      ],
+      "fingerprint": "kKpa5OfK0JI=",
+      "kind": "compute#networkInterface",
+      "name": "nic0",
+      "network": "https://www.googleapis.com/compute/v1/projects/private-cloud-247212/global/networks/private-cloud",
+      "networkIP": "10.0.0.2",
+      "subnetwork": "https://www.googleapis.com/compute/v1/projects/private-cloud-247212/regions/europe-west3/subnetworks/frankfurt-minecraft"
+    }
+  ],
+  "reservationAffinity": {
+    "consumeReservationType": "ANY_RESERVATION"
+  },
+  "scheduling": {
+    "automaticRestart": true,
+    "onHostMaintenance": "MIGRATE",
+    "preemptible": false
+  },
+  "selfLink": "https://www.googleapis.com/compute/v1/projects/private-cloud-247212/zones/europe-west3-c/instances/vpn-server",
+  "serviceAccounts": [
+    {
+      "email": "compute-manager@private-cloud-247212.iam.gserviceaccount.com",
+      "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+      ]
+    }
+  ],
+  "startRestricted": false,
+  "status": "RUNNING",
+  "tags": {
+    "fingerprint": "6smc4R4d39I=",
+    "items": [
+      "http-server",
+      "https-server"
+    ]
+  },
+  "zone": "https://www.googleapis.com/compute/v1/projects/private-cloud-247212/zones/europe-west3-c"
+}

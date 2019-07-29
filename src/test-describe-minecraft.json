@@ -1,0 +1,84 @@
+{
+  "canIpForward": false,
+  "cpuPlatform": "Unknown CPU Platform",
+  "creationTimestamp": "2019-07-21T04:56:23.495-07:00",
+  "deletionProtection": false,
+  "description": "",
+  "disks": [
+    {
+      "autoDelete": false,
+      "boot": true,
+      "deviceName": "minecraft",
+      "guestOsFeatures": [
+        {
+          "type": "VIRTIO_SCSI_MULTIQUEUE"
+        }
+      ],
+      "index": 0,
+      "interface": "SCSI",
+      "kind": "compute#attachedDisk",
+      "licenses": [
+        "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1804-lts"
+      ],
+      "mode": "READ_WRITE",
+      "source": "https://www.googleapis.com/compute/v1/projects/private-cloud-247212/zones/europe-west3-c/disks/minecraft",
+      "type": "PERSISTENT"
+    }
+  ],
+  "id": "1116322196404956169",
+  "kind": "compute#instance",
+  "labelFingerprint": "42WmSpB8rSM=",
+  "machineType": "https://www.googleapis.com/compute/v1/projects/private-cloud-247212/zones/europe-west3-c/machineTypes/n1-standard-1",
+  "metadata": {
+    "fingerprint": "jSqDUEXsmxM=",
+    "items": [
+      {
+        "key": "ssh-keys",
+        "value": "minecraft.compute-manager:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDEI2T+zeZEoLlthV1p5ssp0KVQU1Mrw8+1GZar99xPLsA4LGnIuKNmJPOiGbOqlC/6JMaGqdJIlDPDZVAeOtXL88tYcy5dTuJWzrQtNskyilt7Qv0kU6+cEW2exmlW92BATvhzcATbPCP726SvR638vP3CBiJ1BvRAwZrYFfOBxWjzBwEZxHJVlRhQNpxdM9VdYtgGR7QbyqDsL/iqbGDpTYrmff2s8jspMJ2NXdEORtOhwwVz3O0nATptIbOHiFpvT9BCooH7i1iLFhCV9C5IM9MN5UdLwZ4n4oTCzD1wuT6JKNBWwhC0wo4IlOjAr/RCwyjAlPSO0dcEYKytncbF0GGNnkJ1Zu/nVe8Z3Y1e1Z8YboFMyepVuxkXfBSXnpdaZ+cEY6rP7z7EGeUufk0wbeZ4Wk0/zQxu8Ne8z9tTv8pgTSLAqKkkTCEXyMOTkokbqWhF3oL3d7Ax1Eoyn0HxQPTSnsv1xRTlR1JL1wkkwv4L5Nfc3E1j5d0ip1Ddf8dUJs1W/AsSWDT92PEJdZVcYg4yMNMaTGpcrZ8y7QBZO005naOE5EdJhnI8a35vh1ps7dy7sefdLqV3lGsG9kn4nNnC36xHjcziRXUqZFm5YypxkJBtUzCM0n1400MI+CXdl8/kjbgrH1bl1uH5wI9q2uDzVVNtLt0doTdFU8U7VQ== minecraft.compute-manager@private-cloud-247212.iam.gserviceaccount.com"
+      }
+    ],
+    "kind": "compute#metadata"
+  },
+  "name": "minecraft",
+  "networkInterfaces": [
+    {
+      "fingerprint": "s7ztX1maBG4=",
+      "kind": "compute#networkInterface",
+      "name": "nic0",
+      "network": "https://www.googleapis.com/compute/v1/projects/private-cloud-247212/global/networks/private-cloud",
+      "networkIP": "10.0.0.3",
+      "subnetwork": "https://www.googleapis.com/compute/v1/projects/private-cloud-247212/regions/europe-west3/subnetworks/frankfurt-minecraft"
+    }
+  ],
+  "reservationAffinity": {
+    "consumeReservationType": "ANY_RESERVATION"
+  },
+  "scheduling": {
+    "automaticRestart": true,
+    "onHostMaintenance": "MIGRATE",
+    "preemptible": false
+  },
+  "selfLink": "https://www.googleapis.com/compute/v1/projects/private-cloud-247212/zones/europe-west3-c/instances/minecraft",
+  "serviceAccounts": [
+    {
+      "email": "1098981109275-compute@developer.gserviceaccount.com",
+      "scopes": [
+        "https://www.googleapis.com/auth/devstorage.read_only",
+        "https://www.googleapis.com/auth/logging.write",
+        "https://www.googleapis.com/auth/monitoring.write",
+        "https://www.googleapis.com/auth/servicecontrol",
+        "https://www.googleapis.com/auth/service.management.readonly",
+        "https://www.googleapis.com/auth/trace.append"
+      ]
+    }
+  ],
+  "startRestricted": false,
+  "status": "TERMINATED",
+  "tags": {
+    "fingerprint": "s17Y4vShTtc=",
+    "items": [
+      "protected"
+    ]
+  },
+  "zone": "https://www.googleapis.com/compute/v1/projects/private-cloud-247212/zones/europe-west3-c"
+}
