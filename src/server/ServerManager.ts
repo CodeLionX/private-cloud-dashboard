@@ -33,7 +33,7 @@ export const ServerManager = {
         return true;
     },
     describeInstance: (instanceId: string) => {
-        const command = describeCommand(instanceId);
+        const command = testDescribeCommand(instanceId);
         logger.info(`Getting status from instance ${instanceId} with command: '${command}'`);
         const stdout = execSync(command).toString();
         const status = JSON.parse(stdout) as GCloudDescribeResult;
@@ -67,8 +67,8 @@ export const ServerManager = {
         } as ServerState;
     },
     testStreaming: (instanceId: string) => {
-        const command = `cat src/test-describe-minecraft.json`;
+        const command = `npm i`;
         const process = exec(command);
-        return process.stdout;
+        return [process.stdout, process.stderr];
     }
 };

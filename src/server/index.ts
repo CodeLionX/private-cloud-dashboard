@@ -4,6 +4,7 @@ import session from "express-session";
 import * as http from "http";
 import {Server} from "http";
 import socketio from "socket.io";
+import XTermSize from "../shared/XTermSize";
 import {api} from "./api";
 import {config} from "./config";
 import {logger} from "./logger";
@@ -36,6 +37,9 @@ socketServer.sockets.on("connection", (socket) => {
     const sessionId: string = socket.request.session.id;
     logger.info(`Moving socket ${socket.id} to room /priv/${sessionId}`);
     socket.join("/priv/" + sessionId);
+    socket.on("resize", (data: XTermSize) => {
+        logger.info(`Client requests to resize to ${JSON.stringify(data)}`);
+    });
 });
 
 // route handlers for API

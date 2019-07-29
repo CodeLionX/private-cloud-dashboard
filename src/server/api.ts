@@ -1,5 +1,6 @@
-import {Request, Response, Router} from "express";
-import socketio from "socket.io";
+import {Router} from "express";
+import socketio, {Namespace} from "socket.io";
+import concatStreams from "../shared/concatStreams";
 import ServerState from "../shared/ServerState";
 import {config} from "./config";
 import {logger} from "./logger";
@@ -32,6 +33,25 @@ export const api = (socketServer: socketio.Server) => {
 
         res.contentType("application/json");
         res.send(serverState);
+    });
+
+    router.post("/start-minecraft-server", (req, res) => {
+        const sessionId: string = req.session.id;
+        const room: Namespace = socketServer.in("/priv/" + sessionId);
+        const { instanceId, serverIp } = req.body;
+
+        logger.info(`Received request to start minecraft server ${instanceId} on ${serverIp}`);
+        const [stdout, stderr] = ServerManager.testStreaming(instanceId);
+        const stream = concatStreams([stdout, stderr]);
+        stream.on("data", (data) => {
+            data.toString().split(/(\r?\n)/g).forEach((line: string) => {
+                room.emit("terminal-data", line);
+            });
+        });
+        stream.on("end", () => {
+            logger.info("streamed data!");
+        });
+        res.sendStatus(200);
     });
 
     router.get("/", (req, res) => {
