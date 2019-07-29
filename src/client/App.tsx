@@ -2,9 +2,9 @@
 import {AppBar, createStyles, Theme, Toolbar, Typography} from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import makeStyles from "@material-ui/core/styles/makeStyles";
+import useAxios from "axios-hooks";
 import * as React from "react";
-import {Socket} from "socket.io-client";
-import ServerCard from "./components/ServerCard";
+import ServerCard from "./components/ServerCard/";
 
 export interface AppProps { // tslint:disable-line:no-empty-interface
 }
@@ -28,6 +28,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function App(props: AppProps) {
     const classes = useStyles(props);
+    const [{data}] = useAxios<string[]>("/api/servers");
 
     return (
         <div className={classes.body}>
@@ -44,17 +45,11 @@ export default function App(props: AppProps) {
                   justify="space-evenly"
                   alignItems="center"
                   className={classes.grid}
-                  component="div"
             >
-                {[1, 2].map((i) => (
-                    <React.Fragment key={i}>
-                        <Grid item xs={8} sm={4} lg={2} key={i} className={classes.gridItem} component="div">
-                            <ServerCard serverType={"instance"} statusText={"Healthy"}/>
-                        </Grid>
-                        <Grid item xs={8} sm={4} lg={2} key={100 + i} className={classes.gridItem} component="div">
-                            <ServerCard serverType={"minecraft server"} statusText={"Healthy"}/>
-                        </Grid>
-                    </React.Fragment>
+                {data && data.map((serverId) => (
+                    <Grid item xs={8} sm={4} lg={2} key={serverId} className={classes.gridItem}>
+                        <ServerCard serverId={serverId}/>
+                    </Grid>
                 ))}
             </Grid>
         </div>
