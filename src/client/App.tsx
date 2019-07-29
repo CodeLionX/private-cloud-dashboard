@@ -11,9 +11,13 @@ export interface AppProps { // tslint:disable-line:no-empty-interface
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
+        body: {
+            height: "100%",
+            width: "100%",
+            flexGrow: 1
+        },
         shared: {},
         grid: {
-            flexGrow: 1,
             padding: theme.spacing(2),
         },
         gridItem: {
@@ -26,7 +30,7 @@ export default function App(props: AppProps) {
     const classes = useStyles(props);
 
     return (
-        <div style={{height: "100%", width: "100%", flexGrow: 1}}>
+        <div className={classes.body}>
             <AppBar position="static">
                 <Toolbar>
                     <Typography variant="h6" color="inherit">
@@ -34,13 +38,20 @@ export default function App(props: AppProps) {
                     </Typography>
                 </Toolbar>
             </AppBar>
-            <Grid container spacing={0} className={classes.grid}>
+            <Grid container
+                  spacing={0}
+                  direction="row"
+                  justify="space-evenly"
+                  alignItems="center"
+                  className={classes.grid}
+                  component="div"
+            >
                 {[1, 2].map((i) => (
                     <React.Fragment key={i}>
-                        <Grid item xs={6} sm={3} key={i} className={classes.gridItem}>
+                        <Grid item xs={8} sm={4} lg={2} key={i} className={classes.gridItem} component="div">
                             <ServerCard serverType={"instance"} statusText={"Healthy"}/>
                         </Grid>
-                        <Grid item xs={6} sm={3} key={100 + i} className={classes.gridItem}>
+                        <Grid item xs={8} sm={4} lg={2} key={100 + i} className={classes.gridItem} component="div">
                             <ServerCard serverType={"minecraft server"} statusText={"Healthy"}/>
                         </Grid>
                     </React.Fragment>
