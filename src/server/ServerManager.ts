@@ -33,8 +33,7 @@ export const ServerManager = {
         return true;
     },
     describeInstance: (instanceId: string) => {
-        // const command = statusCommand(instanceId);
-        const command = testDescribeCommand(instanceId);
+        const command = describeCommand(instanceId);
         logger.info(`Getting status from instance ${instanceId} with command: '${command}'`);
         const stdout = execSync(command).toString();
         const status = JSON.parse(stdout) as GCloudDescribeResult;
