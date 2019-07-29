@@ -1,34 +1,24 @@
 import bodyParser from "body-parser";
-import dotenv from "dotenv";
 import express, {Application, RequestHandler} from "express";
 import session from "express-session";
 import * as http from "http";
 import {Server} from "http";
-import path from "path";
 import socketio from "socket.io";
 import {api} from "./api";
+import {config} from "./config";
 import {logger} from "./logger";
-
-// configuration and settings
-dotenv.config();
-const environment: string = process.env.NODE_ENV;
-const host: string = process.env.SERVER_IP; // host ip to bind to
-const port: number = parseInt(process.env.SERVER_PORT, 10); // port to listen
-const sessionSecret: string = process.env.SESSION_SECRET;
-
-const pathToStatic: string = path.join(process.cwd(), "dist", "static");
-logger.info(`Serving static files from ${pathToStatic}`);
 
 // server definition
 const sessionMiddleware: RequestHandler = session({
     resave: false,
     saveUninitialized: true,
-    secret: sessionSecret,
+    secret: config.sessionSecret,
 });
 const app: Application = express();
 
 app.use(sessionMiddleware);
-app.use("/", express.static(pathToStatic));
+app.use("/", express.static(config.pathToStatic));
+logger.info(`Serving static files from ${config.pathToStatic}`);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -52,6 +42,6 @@ socketServer.sockets.on("connection", (socket) => {
 app.use("/api", api(socketServer));
 
 // start server
-httpServer.listen(port, host, () => {
-    logger.info(`server started at http://${host}:${port}`);
+httpServer.listen(config.port, config.host, () => {
+    logger.info(`server started at http://${config.host}:${config.port}`);
 });
