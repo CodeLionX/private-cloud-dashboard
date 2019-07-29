@@ -29,10 +29,9 @@ export const api = (socketServer: socketio.Server) => {
             res.send();
             return;
         }
-        setTimeout( () => {
-            res.contentType("application/json");
-            res.send(serverState);
-        }, Math.random() * 10000 + 1000);
+
+        res.contentType("application/json");
+        res.send(serverState);
     });
 
     router.get("/", (req, res) => {

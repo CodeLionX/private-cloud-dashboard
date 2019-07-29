@@ -28,7 +28,7 @@ const instanceIds: string[] = [
 ];
 
 const minecraftIds: string[] = [
-    "10.0.0.2"
+    "10.0.0.3"
 ];
 
 export const config = {
