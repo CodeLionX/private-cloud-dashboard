@@ -2,7 +2,7 @@
   "name": "private-cloud-dashboard",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "dist/server/index.js",
   "scripts": {
     "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
     "build": "run-p build:server build:client",
@@ -15,7 +15,7 @@
     "start:dev": "node .",
     "dev": "run-p dev:client dev:server",
     "dev:client": "parcel watch src/client/index.html -d dist/static --public-url .",
-    "dev:server": "nodemon -w src/server -e ts,js,json -x run-s build:server start:dev",
+    "dev:server": "nodemon -w src/server -w src/shared -e ts,js,json -x run-s build:server start:dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

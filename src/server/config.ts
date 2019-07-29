@@ -22,10 +22,21 @@ assert(sessionSecret, "Env. variable SESSION_SECRET is not defined!");
 // default values
 const pathToStatic: string = path.join(process.cwd(), "dist", "static");
 
+const instanceIds: string[] = [
+    "8827462774056320514", // vpn-server
+    "1116322196404956169", // minecraft
+];
+
+const minecraftIds: string[] = [
+    "10.0.0.2"
+];
+
 export const config = {
     environment,
     host,
     port,
     sessionSecret,
-    pathToStatic
+    pathToStatic,
+    instanceIds,
+    minecraftIds
 };
