@@ -1,6 +1,10 @@
 import {exec, execSync} from "child_process";
+import {Logger} from "winston";
 import GCloudDescribeResult from "../shared/GCloudDescribeResult";
 import ServerState from "../shared/ServerState";
+import {getLogger} from "./logger";
+
+const logger: Logger = getLogger("ServerManager");
 
 const describeCommand = (instanceId: string) =>
     `gcloud compute instances describe ${instanceId} --zone europe-west3-c --format json`;
@@ -18,17 +22,20 @@ const checkMinecraftCommand = (ip: string) => `python src/check-minecraft.py -H 
 export const ServerManager = {
     startInstance: (instanceId: string) => {
         const command = startCommand(instanceId);
+        logger.info(`Starting instance ${instanceId} with command: '${command}'`);
         // run command
         return true;
     },
     stopInstance: (instanceId: string) => {
         const command = stopCommand(instanceId);
+        logger.info(`Stopping instance ${instanceId} with command: '${command}'`);
         // run command
         return true;
     },
     describeInstance: (instanceId: string) => {
         // const command = statusCommand(instanceId);
         const command = testDescribeCommand(instanceId);
+        logger.info(`Getting status from instance ${instanceId} with command: '${command}'`);
         const stdout = execSync(command).toString();
         const status = JSON.parse(stdout) as GCloudDescribeResult;
         const result: ServerState = {
@@ -42,6 +49,7 @@ export const ServerManager = {
     },
     checkMinecraftStatus: (ip: string) => {
         const command = checkMinecraftCommand(ip);
+        logger.info(`Getting status of minecraft server with ${ip} with command: '${command}'`);
         let healthy: boolean;
         let message: string;
         try {
