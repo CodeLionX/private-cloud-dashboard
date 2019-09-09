@@ -1,4 +1,3 @@
-import axios from "axios";
 import React, { useState } from "react";
 import { Button, Grid, createStyles, Theme } from "@material-ui/core";
 import Dialog from "@material-ui/core/Dialog";
@@ -13,6 +12,7 @@ import ServerDetails from "../../shared/ServerDetails";
 
 export interface TerminalDialogProps {
     serverDetails: ServerDetails;
+    onSocketOpen: () => Promise<void>;
     createOpened?: boolean;
     onClose?: () => void;
 }
@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export default function TerminalDialog(props: TerminalDialogProps) {
-    const { serverDetails, createOpened = false, onClose = () => {} } = props;
+    const { serverDetails, onSocketOpen, createOpened = false, onClose = () => { } } = props;
     const classes = useStyles(props)
     const [isOpen, setOpen] = useState(createOpened);
     const [progress, setProgress] = useState(0);
@@ -45,10 +45,12 @@ export default function TerminalDialog(props: TerminalDialogProps) {
     }
 
     function handleSocketConnect(term) {
-        axios.post("/api/start-server", {
-            serverId: serverDetails.id,
-        }).catch((error) => {
-            term.writeln(`Failed to start ${serverDetails.serverType}: ${error}`);
+        onSocketOpen().catch((error: any) => {
+            if(error.message.includes("403")) {
+                term.writeln(`Action involving ${serverDetails.serverType}-${serverDetails.id} not allowed!`);
+            } else {
+                term.writeln(`Action involving ${serverDetails.serverType}-${serverDetails.id} failed: ${error}`);
+            }
             setProgress(100);
         });
     }

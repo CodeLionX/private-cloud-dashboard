@@ -1,10 +1,10 @@
-import {Router} from "express";
-import socketio, {Namespace} from "socket.io";
+import { Router } from "express";
+import socketio, { Namespace } from "socket.io";
 import concatStreams from "../shared/concatStreams";
 import ServerState from "../shared/ServerState";
-import {config} from "./config";
-import {logger} from "./logger";
-import {ServerManager} from "./ServerManager";
+import { config } from "./config";
+import { logger } from "./logger";
+import { ServerManager } from "./ServerManager";
 
 export const api = (socketServer: socketio.Server) => {
     const router: Router = Router();
@@ -22,9 +22,21 @@ export const api = (socketServer: socketio.Server) => {
         const serverId = req.params.id;
         let serverState: ServerState;
         if (config.instanceIds.includes(serverId)) {
-            serverState = await ServerManager.describeInstance(serverId);
+            try {
+                serverState = await ServerManager.describeInstance(serverId);
+            } catch (err) {
+                res.statusCode = 500;
+                res.send(err.toString());
+                return;
+            }
         } else if (config.minecraftIds.includes(serverId)) {
-            serverState = await ServerManager.checkMinecraftStatus(serverId);
+            try {
+                serverState = await ServerManager.checkMinecraftStatus(serverId);
+            } catch (err) {
+                res.statusCode = 500;
+                res.send(err.toString());
+                return;
+            }
         } else {
             res.sendStatus(404);
             res.send();
@@ -54,7 +66,7 @@ export const api = (socketServer: socketio.Server) => {
         res.sendStatus(200);
     });
 
-    router.post("stop-server", (req, res) => {
+    router.post("/stop-server", (req, res) => {
         const { serverId } = req.body;
 
         if (serverId === "8827462774056320514") {

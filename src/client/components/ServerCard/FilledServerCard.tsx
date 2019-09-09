@@ -7,15 +7,14 @@ import CheckCircle from "@material-ui/icons/CheckCircle";
 import Error from "@material-ui/icons/Error";
 import * as React from "react";
 import ServerState from "../../../shared/ServerState";
-import ServerDetails from "../../../shared/ServerDetails";
 import { HealthyAvatar, UnhealthyAvatar, useFilledServerCardStyles } from "./ServerCardStyles";
 import ServerMenu from "../ServerMenu";
 
 export interface FilledServerCardProps {
     serverState: ServerState;
     onRefreshClick: () => void;
-    onStartClick: (serverDetails: ServerDetails) => void;
-    onStopClick: (serverDetails: ServerDetails) => void;
+    onStartClick: () => void;
+    onStopClick: () => void;
 }
 
 const cardDetails = {
@@ -52,8 +51,8 @@ export default function FilledServerCard(props: FilledServerCardProps) {
                     displayStart={!healthy}
                     displayStop={healthy}
                     onRefreshClick={() => props.onRefreshClick()}
-                    onStartClick={() => props.onStartClick(props.serverState)}
-                    onStopClick={() => props.onStopClick(props.serverState)}
+                    onStartClick={() => props.onStartClick()}
+                    onStopClick={() => props.onStopClick()}
                 />}
                 title={`${title} Status`}
                 subheader={name}

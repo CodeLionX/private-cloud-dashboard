@@ -1,3 +1,4 @@
+import axios from "axios";
 import useAxios from "axios-hooks";
 import * as React from "react";
 import { useState } from "react";
@@ -8,6 +9,8 @@ import LoadingServerCard from "./LoadingServerCard";
 import TerminalDialog from "../TerminalDialog";
 import ServerDetails from "../../../shared/ServerDetails";
 
+type ActionType = "START" | "STOP" | null;
+
 export interface ServerCardProps {
     serverId: string;
 }
@@ -15,11 +18,22 @@ export interface ServerCardProps {
 export default function ServerCard(props: ServerCardProps) {
     const { serverId } = props;
 
-    const [serverDetails, setServerDetails] = useState(null);
+    const [actionType, setActionType] = useState<ActionType>(null)
     const [{ data, loading, error }, refetch] = useAxios<ServerState>(`/api/server/${serverId}`);
 
+    async function handleDialogOpen() {
+        if (actionType === "START") {
+            await axios.post("/api/start-server", {
+                serverId: data.id
+            });
+        } else if (actionType === "STOP") {
+            await axios.post("/api/stop-server", {
+                serverId: data.id
+            })
+        }
+    }
     function handleDialogClose() {
-        setServerDetails(null);
+        setActionType(null);
         refetch();
     }
 
@@ -33,9 +47,19 @@ export default function ServerCard(props: ServerCardProps) {
         <FilledServerCard
             serverState={data}
             onRefreshClick={refetch}
-            onStartClick={(details: ServerDetails) => { setServerDetails(details); console.info(`Request to start ${JSON.stringify(details)}`); }}
-            onStopClick={(details: ServerDetails) => console.info(`Request to stop ${JSON.stringify(details)}`)}
+            onStartClick={() => {
+                setActionType("START");
+                console.info(`Request to start ${JSON.stringify(data)}`);
+            }}
+            onStopClick={() => {
+                setActionType("STOP");
+                console.info(`Request to stop ${JSON.stringify(data)}`);
+            }}
         />
-        {serverDetails && <TerminalDialog serverDetails={serverDetails} createOpened={true} onClose={handleDialogClose}/>}
+        {actionType && <TerminalDialog
+            serverDetails={data}
+            createOpened={true}
+            onSocketOpen={handleDialogOpen}
+            onClose={handleDialogClose} />}
     </>);
 }
