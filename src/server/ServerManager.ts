@@ -69,7 +69,7 @@ export const ServerManager = {
         pipeStreamsThroughWS([process.stdout, process.stderr], room);
     },
     describeInstance: async (instanceId: string) => {
-        const command = testDescribeCommand(instanceId);
+        const command = describeCommand(instanceId);
         logger.info(`Getting status from instance ${instanceId} with command: '${command}'`);
         const { stdout } = await pExec(command);
         const status = JSON.parse(stdout.toString()) as GCloudDescribeResult;
