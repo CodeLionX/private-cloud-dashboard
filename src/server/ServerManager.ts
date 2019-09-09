@@ -39,7 +39,7 @@ function pipeStreamsThroughWS(streams: Stream[], room: Namespace) {
             .map((line: string) => line.trimRight())
             .filter((line: string) => !!line)
             .forEach((line: string) => {
-                if (progress <= 90) {
+                if (progress <= 85) {
                     progress += 2;
                     room.emit("progress", progress);
                 }

@@ -57,7 +57,8 @@ export default function ServerCard(props: ServerCardProps) {
             }}
         />
         {actionType && <TerminalDialog
-            serverDetails={data}
+            title={`${actionType === "START" ? "Starting" : "Stopping"} ${data.serverType} ${data.name}`}
+            description={`${data.name} is being ${actionType === "START" ? "started" : "stopped"}, please wait.`}
             createOpened={true}
             onSocketOpen={handleDialogOpen}
             onClose={handleDialogClose} />}

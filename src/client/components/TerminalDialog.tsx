@@ -11,9 +11,11 @@ import TerminalDisplay from "./TerminalDisplay";
 import ServerDetails from "../../shared/ServerDetails";
 
 export interface TerminalDialogProps {
-    serverDetails: ServerDetails;
+    title: string;
+    description: string;
     onSocketOpen: () => Promise<void>;
     createOpened?: boolean;
+    actionName?: string;
     onClose?: () => void;
 }
 
@@ -30,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export default function TerminalDialog(props: TerminalDialogProps) {
-    const { serverDetails, onSocketOpen, createOpened = false, onClose = () => { } } = props;
+    const { title, description, actionName, onSocketOpen, createOpened = false, onClose = () => { } } = props;
     const classes = useStyles(props)
     const [isOpen, setOpen] = useState(createOpened);
     const [progress, setProgress] = useState(0);
@@ -46,10 +48,10 @@ export default function TerminalDialog(props: TerminalDialogProps) {
 
     function handleSocketConnect(term) {
         onSocketOpen().catch((error: any) => {
-            if(error.message.includes("403")) {
-                term.writeln(`Action involving ${serverDetails.serverType}-${serverDetails.id} not allowed!`);
+            if (error.message.includes("403")) {
+                term.writeln(`${title} not allowed!`);
             } else {
-                term.writeln(`Action involving ${serverDetails.serverType}-${serverDetails.id} failed: ${error}`);
+                term.writeln(`${title} failed: ${error}`);
             }
             setProgress(100);
         });
@@ -58,7 +60,7 @@ export default function TerminalDialog(props: TerminalDialogProps) {
     return (
         <React.Fragment>
             {!createOpened && <Button variant={"contained"} color="primary" onClick={handleClickOpen}>
-                Start {serverDetails.serverType}
+                {actionName || "Start"}
             </Button>
             }
             <Dialog
@@ -66,9 +68,9 @@ export default function TerminalDialog(props: TerminalDialogProps) {
                 maxWidth={"lg"}
                 open={isOpen}
                 onClose={handleClose}
-                aria-labelledby={`Starting ${serverDetails.serverType}`}
+                aria-labelledby={title}
             >
-                <DialogTitle id="dialog-title">Starting {serverDetails.serverType}</DialogTitle>
+                <DialogTitle id="dialog-title">{title}</DialogTitle>
                 <DialogContent dividers>
                     <Grid container
                         spacing={0}
@@ -77,7 +79,7 @@ export default function TerminalDialog(props: TerminalDialogProps) {
                         alignItems="stretch">
                         <Grid item>
                             <DialogContentText className={classes.dialogText}>
-                                {serverDetails.serverType} is being started. Progress:
+                                {description} Progress:
                             </DialogContentText>
                         </Grid>
                         <Grid item>
