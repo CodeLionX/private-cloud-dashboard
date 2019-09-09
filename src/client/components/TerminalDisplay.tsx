@@ -5,23 +5,17 @@ import {RefObject} from "react";
 import socketio, {Socket} from "socket.io-client";
 import {Terminal} from "xterm";
 import {fit} from "xterm/lib/addons/fit/fit";
-import XTermSize from "../../shared/XTermSize";
 
 interface TerminalDisplayProps {
     instanceId: string;
     serverIp: string;
+    onProgress: (progress: number) => void
 }
 
-interface TerminalDisplayState {
-    connected: boolean;
-}
-
-export default class TerminalDisplay extends React.Component<TerminalDisplayProps, TerminalDisplayState> {
+export default class TerminalDisplay extends React.Component<TerminalDisplayProps> {
     private readonly containerRef: RefObject<HTMLDivElement>;
     private readonly term: Terminal;
     private readonly socket: typeof Socket;
-
-    public state: TerminalDisplayState;
 
     public constructor(props: TerminalDisplayProps) {
         super(props);
@@ -39,18 +33,21 @@ export default class TerminalDisplay extends React.Component<TerminalDisplayProp
             axios.post("/api/start-minecraft-server", {
                 instanceId: props.instanceId,
                 serverIp: props.serverIp,
-            }).catch((error) =>
-                console.error(error)
-            );
-
-            this.setState({
-                connected: true
+            }).catch((error) => {
+                this.term.writeln(`Failed to start minecraft server: ${error}`);
+                this.props.onProgress(100);
             });
         });
-        this.socket.on("status", (data: any) => {
-            console.info(`Received status from server: ${JSON.stringify(data)}`);
+        this.socket.on("terminal-data", (line: string) => {
+            this.term.writeln(line);
+            this.term.scrollToBottom();
         });
-
+        this.socket.on("progress", this.props.onProgress);
+        this.socket.on("end", () => {
+            this.term.writeln("\nFinished!");
+            this.term.scrollToBottom();
+            this.props.onProgress(100);
+        });
     }
 
     public componentDidMount() {
@@ -58,22 +55,8 @@ export default class TerminalDisplay extends React.Component<TerminalDisplayProp
             const xterm = this.term;
             xterm.open(this.containerRef.current);
             xterm.focus();
-            xterm.writeln("Connecting ...");
+            xterm.writeln("Connecting ...\n");
             fit(xterm);
-            if (this.socket) {
-                const size: XTermSize = {
-                    cols: xterm.cols,
-                    rows: xterm.rows
-                };
-                this.socket.emit("resize", size);
-            }
-        }
-        if (this.socket) {
-            this.socket.on("terminal-data", (line: string) => {
-                console.info(`Received terminal-data: ${line}`);
-                this.term.write(line);
-            });
-            console.info("Registered stream listener");
         }
     }
 
@@ -82,7 +65,9 @@ export default class TerminalDisplay extends React.Component<TerminalDisplayProp
             this.term.destroy();
         }
         if (this.socket) {
+            this.socket.off("progress");
             this.socket.off("terminal-data");
+            this.socket.close();
         }
     }
 

@@ -18,13 +18,13 @@ export const api = (socketServer: socketio.Server) => {
         res.send(servers);
     });
 
-    router.get("/server/:id", (req, res) => {
+    router.get("/server/:id", async (req, res) => {
         const serverId = req.params.id;
         let serverState: ServerState;
         if (config.instanceIds.includes(serverId)) {
-            serverState = ServerManager.describeInstance(serverId);
+            serverState = await ServerManager.describeInstance(serverId);
         } else if (config.minecraftIds.includes(serverId)) {
-            serverState = ServerManager.checkMinecraftStatus(serverId);
+            serverState = await ServerManager.checkMinecraftStatus(serverId);
         } else {
             res.sendStatus(404);
             res.send();
@@ -41,15 +41,27 @@ export const api = (socketServer: socketio.Server) => {
         const { instanceId, serverIp } = req.body;
 
         logger.info(`Received request to start minecraft server ${instanceId} on ${serverIp}`);
+        let progress = 10;
+        room.emit("progress", progress);
         const [stdout, stderr] = ServerManager.testStreaming(instanceId);
         const stream = concatStreams([stdout, stderr]);
         stream.on("data", (data) => {
-            data.toString().split(/(\r?\n)/g).forEach((line: string) => {
-                room.emit("terminal-data", line);
-            });
+            data.toString()
+                .split(/(\r?\n)/g)
+                .map((line: string) => line.trimRight())
+                .filter((line: string) => !!line)
+                .forEach((line: string) => {
+                    if(progress < 85) {
+                        progress += 5;
+                        room.emit("progress", progress);
+                    }
+                    room.emit("terminal-data", line);
+                });
         });
         stream.on("end", () => {
             logger.info("streamed data!");
+            room.emit("progress", 100);
+            room.emit("end");
         });
         res.sendStatus(200);
     });
