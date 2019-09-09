@@ -1,8 +1,11 @@
 import {exec, execSync} from "child_process";
+import util from "util";
 import {Logger} from "winston";
 import GCloudDescribeResult from "../shared/GCloudDescribeResult";
 import ServerState from "../shared/ServerState";
 import {getLogger} from "./logger";
+
+const pExec = util.promisify(exec);
 
 const logger: Logger = getLogger("ServerManager");
 
@@ -32,11 +35,11 @@ export const ServerManager = {
         // run command
         return true;
     },
-    describeInstance: (instanceId: string) => {
+    describeInstance: async (instanceId: string) => {
         const command = testDescribeCommand(instanceId);
         logger.info(`Getting status from instance ${instanceId} with command: '${command}'`);
-        const stdout = execSync(command).toString();
-        const status = JSON.parse(stdout) as GCloudDescribeResult;
+        const {stdout} = await pExec(command);
+        const status = JSON.parse(stdout.toString()) as GCloudDescribeResult;
         const result: ServerState = {
             id: status.id,
             name: status.name,
@@ -46,14 +49,21 @@ export const ServerManager = {
         };
         return result;
     },
-    checkMinecraftStatus: (ip: string) => {
+    checkMinecraftStatus: async (ip: string) => {
         const command = checkMinecraftCommand(ip);
         logger.info(`Getting status of minecraft server with ${ip} with command: '${command}'`);
         let healthy: boolean;
         let message: string;
+
         try {
             healthy = true;
-            message = execSync(command).toString();
+            const {stdout, stderr} = await pExec(command);
+            message = stdout.toString();
+            const errorMessage = stderr.toString();
+            if(errorMessage) {
+                healthy = false;
+                message = errorMessage;
+            }
         } catch (error) {
             healthy = false;
             message = error.stdout.toString();
