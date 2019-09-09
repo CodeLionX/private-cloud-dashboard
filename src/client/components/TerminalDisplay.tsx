@@ -1,15 +1,12 @@
-// tslint:disable:no-console
-import axios from "axios";
 import * as React from "react";
-import {RefObject} from "react";
-import socketio, {Socket} from "socket.io-client";
-import {Terminal} from "xterm";
-import {fit} from "xterm/lib/addons/fit/fit";
+import { RefObject } from "react";
+import socketio, { Socket } from "socket.io-client";
+import { Terminal } from "xterm";
+import { fit } from "xterm/lib/addons/fit/fit";
 
 interface TerminalDisplayProps {
-    instanceId: string;
-    serverIp: string;
     onProgress: (progress: number) => void
+    onSocketConnect: (term: Terminal) => void;
 }
 
 export default class TerminalDisplay extends React.Component<TerminalDisplayProps> {
@@ -28,16 +25,9 @@ export default class TerminalDisplay extends React.Component<TerminalDisplayProp
         });
 
         this.socket = socketio.connect("/");
-        this.socket.on("connect", () => {
-            console.info(`connected to server as ${this.socket.id}`);
-            axios.post("/api/start-minecraft-server", {
-                instanceId: props.instanceId,
-                serverIp: props.serverIp,
-            }).catch((error) => {
-                this.term.writeln(`Failed to start minecraft server: ${error}`);
-                this.props.onProgress(100);
-            });
-        });
+        this.socket.on("connect", () =>
+            this.props.onSocketConnect(this.term)
+        );
         this.socket.on("terminal-data", (line: string) => {
             this.term.writeln(line);
             this.term.scrollToBottom();
@@ -74,6 +64,6 @@ export default class TerminalDisplay extends React.Component<TerminalDisplayProp
     public render() {
         return <div id="window-terminal-container" ref={this.containerRef} style={{
             width: "100%", height: "100%"
-        }}/>;
+        }} />;
     }
 }

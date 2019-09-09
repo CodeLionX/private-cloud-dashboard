@@ -1,11 +1,10 @@
 // tslint:disable:no-console
-import {AppBar, createStyles, Theme, Toolbar, Typography} from "@material-ui/core";
+import { AppBar, createStyles, Theme, Toolbar, Typography } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import useAxios from "axios-hooks";
 import * as React from "react";
 import ServerCard from "./components/ServerCard/";
-import TerminalDialog from "./components/TerminalDialog";
 
 export interface AppProps { // tslint:disable-line:no-empty-interface
 }
@@ -29,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function App(props: AppProps) {
     const classes = useStyles(props);
-    const [{data}] = useAxios<string[]>("/api/servers");
+    const [{ data }] = useAxios<string[]>("/api/servers");
 
     return (
         <div className={classes.body}>
@@ -41,19 +40,18 @@ export default function App(props: AppProps) {
                 </Toolbar>
             </AppBar>
             <Grid container
-                  spacing={0}
-                  direction="row"
-                  justify="space-evenly"
-                  alignItems="center"
-                  className={classes.grid}
+                spacing={0}
+                direction="row"
+                justify="space-evenly"
+                alignItems="center"
+                className={classes.grid}
             >
                 {data && data.map((serverId) => (
                     <Grid item xs={8} sm={4} lg={2} key={serverId} className={classes.gridItem}>
-                        <ServerCard serverId={serverId}/>
+                        <ServerCard serverId={serverId} />
                     </Grid>
                 ))}
             </Grid>
-            <TerminalDialog/>
         </div>
     );
 }

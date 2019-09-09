@@ -35,48 +35,50 @@ export const api = (socketServer: socketio.Server) => {
         res.send(serverState);
     });
 
-    router.post("/start-minecraft-server", (req, res) => {
+    router.post("/start-server", (req, res) => {
         const sessionId: string = req.session.id;
         const room: Namespace = socketServer.in("/priv/" + sessionId);
-        const { instanceId, serverIp } = req.body;
+        const { serverId } = req.body;
 
-        logger.info(`Received request to start minecraft server ${instanceId} on ${serverIp}`);
-        let progress = 10;
-        room.emit("progress", progress);
-        const [stdout, stderr] = ServerManager.testStreaming(instanceId);
-        const stream = concatStreams([stdout, stderr]);
-        stream.on("data", (data) => {
-            data.toString()
-                .split(/(\r?\n)/g)
-                .map((line: string) => line.trimRight())
-                .filter((line: string) => !!line)
-                .forEach((line: string) => {
-                    if(progress < 85) {
-                        progress += 5;
-                        room.emit("progress", progress);
-                    }
-                    room.emit("terminal-data", line);
-                });
-        });
-        stream.on("end", () => {
-            logger.info("streamed data!");
-            room.emit("progress", 100);
-            room.emit("end");
-        });
+        logger.info(`Received request to start server with serverId ${serverId}`);
+
+        if (config.instanceIds.includes(serverId)) {
+            ServerManager.startInstanceStreaming(serverId, room);
+        } else if (config.minecraftIds.includes(serverId)) {
+            ServerManager.startMinecraftServerStreaming(serverId, room);
+        } else {
+            res.sendStatus(404);
+            res.send();
+            return;
+        }
         res.sendStatus(200);
     });
 
-    router.get("/", (req, res) => {
-        const sessionId: string = req.session.id;
-        const room: string = "/priv/" + req.session.id;
+    router.post("stop-server", (req, res) => {
+        const { serverId } = req.body;
 
-        logger.info(`Request to /api in session ${sessionId}`);
-        logger.info(`Sending status to client in room ${room}`);
-        socketServer
-            .in(room)
-            .emit("status", { msg: "/api requested" });
-        res.send("Hello world!");
-    });
+        if(serverId === "8827462774056320514") {
+            res.statusCode = 403;
+            res.send("Can not stop the vpn-server itself!");
+            return;
+        }
+
+        const sessionId: string = req.session.id;
+        const room: Namespace = socketServer.in("/priv/" + sessionId);
+
+        logger.info(`Received request to stop server with serverId ${serverId}`);
+
+        if (config.instanceIds.includes(serverId)) {
+            ServerManager.stopInstanceStreaming(serverId, room);
+        } else if (config.minecraftIds.includes(serverId)) {
+            ServerManager.stopMinecraftServerStreaming(serverId, room);
+        } else {
+            res.sendStatus(404);
+            res.send();
+            return;
+        }
+        res.sendStatus(200);
+    })
 
     return router;
 };

@@ -1,9 +1,12 @@
-import {exec, execSync} from "child_process";
+import { exec } from "child_process";
+import { Stream } from "stream";
 import util from "util";
-import {Logger} from "winston";
+import { Logger } from "winston";
+import { Namespace } from "socket.io";
 import GCloudDescribeResult from "../shared/GCloudDescribeResult";
 import ServerState from "../shared/ServerState";
-import {getLogger} from "./logger";
+import { getLogger } from "./logger";
+import concatStreams from "../shared/concatStreams";
 
 const pExec = util.promisify(exec);
 
@@ -20,25 +23,54 @@ const startCommand = (instanceId: string) =>
 
 const testDescribeCommand = (instanceId: string) => `cat src/test-describe-${instanceId}.json`;
 
-const checkMinecraftCommand = (ip: string) => `python src/check-minecraft.py -H ${ip} -p 25565`;
+const checkMinecraftCommand = (ip: string) => `python src/check-minecraft.py -H ${ip} -p 25565 --motd 'What the turtle?!'`;
+
+const startMinecraftServerCommand = "/home/sebastian.schmidl/management/start-minecraft-server.sh";
+const stopMinecraftServerCommand = "/home/sebastian.schmidl/management/stop-minecraft-server.sh";
+
+function pipeStreamsThroughWS(streams: Stream[], room: Namespace) {
+    const stream = concatStreams(streams);
+    let progress = 5;
+    room.emit("progress", progress);
+    stream.on("data", (data: any) => {
+        data.toString()
+            .split(/(\r?\n)/g)
+            .map((line: string) => line.trimRight())
+            .filter((line: string) => !!line)
+            .forEach((line: string) => {
+                if (progress <= 90) {
+                    progress += 2;
+                    room.emit("progress", progress);
+                }
+                room.emit("terminal-data", line);
+            });
+    });
+    stream.on("end", () => {
+        logger.info("streamed data!");
+        room.emit("progress", 100);
+        room.emit("end");
+    });
+}
 
 export const ServerManager = {
-    startInstance: (instanceId: string) => {
+    startInstanceStreaming: (instanceId: string, room: Namespace) => {
         const command = startCommand(instanceId);
         logger.info(`Starting instance ${instanceId} with command: '${command}'`);
-        // run command
-        return true;
+
+        const process = exec(command);
+        pipeStreamsThroughWS([process.stdout, process.stderr], room);
     },
-    stopInstance: (instanceId: string) => {
+    stopInstanceStreaming: (instanceId: string, room: Namespace) => {
         const command = stopCommand(instanceId);
         logger.info(`Stopping instance ${instanceId} with command: '${command}'`);
-        // run command
-        return true;
+
+        const process = exec(command);
+        pipeStreamsThroughWS([process.stdout, process.stderr], room);
     },
     describeInstance: async (instanceId: string) => {
         const command = describeCommand(instanceId);
         logger.info(`Getting status from instance ${instanceId} with command: '${command}'`);
-        const {stdout} = await pExec(command);
+        const { stdout } = await pExec(command);
         const status = JSON.parse(stdout.toString()) as GCloudDescribeResult;
         const result: ServerState = {
             id: status.id,
@@ -57,10 +89,10 @@ export const ServerManager = {
 
         try {
             healthy = true;
-            const {stdout, stderr} = await pExec(command);
+            const { stdout, stderr } = await pExec(command);
             message = stdout.toString();
             const errorMessage = stderr.toString();
-            if(errorMessage) {
+            if (errorMessage) {
                 healthy = false;
                 message = errorMessage;
             }
@@ -76,8 +108,20 @@ export const ServerManager = {
             healthy,
         } as ServerState;
     },
+    startMinecraftServerStreaming: (ip: string, room: Namespace) => {
+        logger.info(`Starting instance ${ip} with command: '${startMinecraftServerCommand}'`);
+
+        const process = exec(startMinecraftServerCommand);
+        pipeStreamsThroughWS([process.stdout, process.stderr], room);
+    },
+    stopMinecraftServerStreaming: (ip: string, room: Namespace) => {
+        logger.info(`Starting instance ${ip} with command: '${stopMinecraftServerCommand}'`);
+
+        const process = exec(stopMinecraftServerCommand);
+        pipeStreamsThroughWS([process.stdout, process.stderr], room);
+    },
     testStreaming: (instanceId: string) => {
-        const command = `bash /home/sebastian.schmidl/management/start-server.sh`;
+        const command = `npm i`;
         const process = exec(command);
         return [process.stdout, process.stderr];
     }
