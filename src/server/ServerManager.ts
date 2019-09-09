@@ -1,12 +1,12 @@
 import { exec } from "child_process";
+import { Namespace } from "socket.io";
 import { Stream } from "stream";
 import util from "util";
 import { Logger } from "winston";
-import { Namespace } from "socket.io";
+import concatStreams from "../shared/concatStreams";
 import GCloudDescribeResult from "../shared/GCloudDescribeResult";
 import ServerState from "../shared/ServerState";
 import { getLogger } from "./logger";
-import concatStreams from "../shared/concatStreams";
 
 const pExec = util.promisify(exec);
 
@@ -23,7 +23,8 @@ const startCommand = (instanceId: string) =>
 
 const testDescribeCommand = (instanceId: string) => `cat src/test-describe-${instanceId}.json`;
 
-const checkMinecraftCommand = (ip: string) => `python src/check-minecraft.py -H ${ip} -p 25565 --motd 'What the turtle?!'`;
+const checkMinecraftCommand = (ip: string) =>
+    `python src/check-minecraft.py -H ${ip} -p 25565 --motd 'What the turtle?!'`;
 
 const startMinecraftServerCommand = "/home/sebastian.schmidl/management/start-minecraft-server.sh";
 const stopMinecraftServerCommand = "/home/sebastian.schmidl/management/stop-minecraft-server.sh";

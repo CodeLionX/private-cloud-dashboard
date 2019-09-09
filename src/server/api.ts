@@ -57,7 +57,7 @@ export const api = (socketServer: socketio.Server) => {
     router.post("stop-server", (req, res) => {
         const { serverId } = req.body;
 
-        if(serverId === "8827462774056320514") {
+        if (serverId === "8827462774056320514") {
             res.statusCode = 403;
             res.send("Can not stop the vpn-server itself!");
             return;
@@ -78,7 +78,7 @@ export const api = (socketServer: socketio.Server) => {
             return;
         }
         res.sendStatus(200);
-    })
+    });
 
     return router;
 };
